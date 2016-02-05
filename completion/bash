@@ -16,10 +16,22 @@
 
 # Enable bash autocompletion.
 function _gulp_completions() {
+  # Grab tasks...
+  local compls
+  local cache_filepath=/tmp/gulp_completion_cache_$(pwd | sha1sum | cut -d' ' -f1)
+  if [ -f $cache_filepath ] && [ $(stat -c %Y ./gulpfile.js) -lt $(stat -c %Y $cache_filepath) ]
+  then
+    # From cache file.
+    compls=$(cat $cache_filepath)
+  else
+    # From gulp.
+    compls=$(gulp --tasks-simple)
+    echo $compls > $cache_filepath
+  fi
+
   # The currently-being-completed word.
   local cur="${COMP_WORDS[COMP_CWORD]}"
-  #Grab tasks
-  local compls=$(gulp --tasks-simple)
+
   # Tell complete what stuff to show.
   COMPREPLY=($(compgen -W "$compls" -- "$cur"))
 }
