@@ -32,8 +32,14 @@ function _gulp_completions() {
   # The currently-being-completed word.
   local cur="${COMP_WORDS[COMP_CWORD]}"
 
+  # Make the char ':' no to be considered as a word break.
+  _get_comp_words_by_ref -n : cur
+
   # Tell complete what stuff to show.
   COMPREPLY=($(compgen -W "$compls" -- "$cur"))
+
+  # Remove colon-containing prefix from the suggestions.
+  __ltrim_colon_completions "$cur"
 }
 
 complete -o default -F _gulp_completions gulp
